@@ -6,21 +6,37 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from 'fs'; // Importa o File System
 
 const app = express();
 
-// === MODIFICAÇÃO 1: Caminho do Banco de Dados ===
-// Vamos ler o caminho do .env, ou usar o local como padrão
-const DB_PATH = process.env.DB_PATH || "./database.sqlite";
+// === Lógica de Deploy (PORTA e DB_PATH) ===
+// 1. Define a porta: Usa a porta do Render (process.env.PORT) ou 3000 se estiver local
+const PORTA = process.env.PORT || 3000;
+
+// 2. Define o caminho do DB: Usa o caminho do Render (process.env.DB_PATH) ou ./database.sqlite local
+const DB_PATH = process.env.DB_PATH || './database.sqlite';
+
+// 3. Garante que o diretório do banco de dados exista (necessário para o Render)
+// O Render usa '/var/data/database.sqlite'. Precisamos garantir que '/var/data' exista.
+if (process.env.DB_PATH) {
+    const dir = path.dirname(DB_PATH);
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+        console.log(`Diretório do banco de dados criado em: ${dir}`);
+    }
+}
+// ==========================================
+
 const db = new sqlite3.Database(DB_PATH, (err) => {
     if (err) {
         console.error("Erro ao abrir o banco de dados:", err.message);
     } else {
-        console.log("Conectado ao banco de dados SQLite em:", DB_PATH);
+        console.log(`Conectado ao banco de dados SQLite em: ${DB_PATH}`);
     }
 });
-// ===============================================
 
+// Chave secreta lida do .env
 const JWT_SECRET = process.env.JWT_SECRET;
 
 app.use(cors());
@@ -56,6 +72,11 @@ app.post("/api/register", async (req,res)=>{
     db.run("INSERT INTO users (username,password_hash) VALUES (?,?)",
         [username, hash], function(err){
             if(err) return res.status(400).json({error:"Usuário já existe"});
+            
+            // Verifica se JWT_SECRET foi carregado
+            if (!JWT_SECRET) {
+                return res.status(500).json({ error: "Erro interno do servidor: Chave secreta não configurada." });
+            }
             const token = jwt.sign({id:this.lastID, username}, JWT_SECRET);
             res.json({token});
         });
@@ -67,6 +88,11 @@ app.post("/api/login", (req,res)=>{
     db.get("SELECT * FROM users WHERE username=?", [username], async (err, user)=>{
         if(!user) return res.status(400).json({error:"Usuário não encontrado"});
         if(!await bcrypt.compare(password,user.password_hash)) return res.status(400).json({error:"Senha inválida"});
+        
+        // Verifica se JWT_SECRET foi carregado
+        if (!JWT_SECRET) {
+            return res.status(500).json({ error: "Erro interno do servidor: Chave secreta não configurada." });
+        }
         const token = jwt.sign({id:user.id, username}, JWT_SECRET);
         res.json({token});
     });
@@ -76,6 +102,11 @@ app.post("/api/login", (req,res)=>{
 function auth(req,res,next){
     const token = req.headers.authorization?.split(" ")[1];
     if(!token) return res.sendStatus(401);
+    
+    // Verifica se JWT_SECRET foi carregado
+    if (!JWT_SECRET) {
+        return res.status(500).json({ error: "Erro interno do servidor: Chave secreta não configurada." });
+    }
     try{
         req.user = jwt.verify(token, JWT_SECRET);
         next();
@@ -125,6 +156,6 @@ app.put("/api/notas/:id", auth, (req,res)=>{
 });
 
 
-// === MODIFICAÇÃO 2: Porta Dinâmica ===
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, ()=> console.log(`Servidor rodando em http://localhost:${PORT}`));
+// Start
+app.listen(PORTA, ()=> console.log(`Servidor rodando em http://localhost:${PORTA}`));
+
