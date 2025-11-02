@@ -6,7 +6,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import path from "path";
 import { fileURLToPath } from "url";
-import fs from 'fs'; // Importa o File System
+// Não precisamos mais do 'fs' (File System) porque o Render cria o disco para nós
 
 const app = express();
 
@@ -15,19 +15,12 @@ const app = express();
 const PORTA = process.env.PORT || 3000;
 
 // 2. Define o caminho do DB: Usa o caminho do Render (process.env.DB_PATH) ou ./database.sqlite local
+// O valor de DB_PATH no Render deve ser '/var/data/database.sqlite'
 const DB_PATH = process.env.DB_PATH || './database.sqlite';
 
-// 3. Garante que o diretório do banco de dados exista (necessário para o Render)
-// O Render usa '/var/data/database.sqlite'. Precisamos garantir que '/var/data' exista.
-if (process.env.DB_PATH) {
-    const dir = path.dirname(DB_PATH);
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-        console.log(`Diretório do banco de dados criado em: ${dir}`);
-    }
-}
 // ==========================================
 
+// O Render garante que o diretório exista se você configurou o "Disk" (Disco)
 const db = new sqlite3.Database(DB_PATH, (err) => {
     if (err) {
         console.error("Erro ao abrir o banco de dados:", err.message);
@@ -73,7 +66,6 @@ app.post("/api/register", async (req,res)=>{
         [username, hash], function(err){
             if(err) return res.status(400).json({error:"Usuário já existe"});
             
-            // Verifica se JWT_SECRET foi carregado
             if (!JWT_SECRET) {
                 return res.status(500).json({ error: "Erro interno do servidor: Chave secreta não configurada." });
             }
@@ -89,7 +81,6 @@ app.post("/api/login", (req,res)=>{
         if(!user) return res.status(400).json({error:"Usuário não encontrado"});
         if(!await bcrypt.compare(password,user.password_hash)) return res.status(400).json({error:"Senha inválida"});
         
-        // Verifica se JWT_SECRET foi carregado
         if (!JWT_SECRET) {
             return res.status(500).json({ error: "Erro interno do servidor: Chave secreta não configurada." });
         }
@@ -103,7 +94,6 @@ function auth(req,res,next){
     const token = req.headers.authorization?.split(" ")[1];
     if(!token) return res.sendStatus(401);
     
-    // Verifica se JWT_SECRET foi carregado
     if (!JWT_SECRET) {
         return res.status(500).json({ error: "Erro interno do servidor: Chave secreta não configurada." });
     }
@@ -158,4 +148,3 @@ app.put("/api/notas/:id", auth, (req,res)=>{
 
 // Start
 app.listen(PORTA, ()=> console.log(`Servidor rodando em http://localhost:${PORTA}`));
-
