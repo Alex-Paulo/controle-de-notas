@@ -32,8 +32,11 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
 // Chave secreta lida do .env
 const JWT_SECRET = process.env.JWT_SECRET;
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+    origin: '*', // Permite todas as origens (mais fácil para deploy)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Caminho correto para /public
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
