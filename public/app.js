@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     // ==================== Variáveis Globais ====================
-    const API = "/api";
+    const API = "https://controle-de-notas.onrender.com/api"
     let token = localStorage.getItem("token");
     let notas = [];
     let grafico = null;
