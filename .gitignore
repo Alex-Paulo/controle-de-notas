@@ -1,0 +1,8 @@
+# Ignora a pasta de módulos do Node
+node_modules
+
+# IGNORA O ARQUIVO DE SENHAS
+.env
+
+# Ignora o banco de dados
+database.sqlite

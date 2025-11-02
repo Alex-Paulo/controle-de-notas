@@ -1,0 +1,317 @@
+/* ====================
+   Configurações Globais (Mais Profissionais)
+   ==================== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #333;
+    margin: 0;
+    
+    background-image: url('Controle-Interno.png'); /* Imagem de fundo */
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-color: rgba(0, 0, 0, 0.5); 
+    background-blend-mode: overlay;
+ 
+}
+
+.hidden {
+    display: none;
+}
+
+/* ====================
+   Estilo da Caixa de Login (EFEITO VIDRO FOSCO)
+   ==================== */
+#loginBox {
+    max-width: 380px; /* Um pouco maior */
+    margin: 50px auto;
+    padding: 30px;
+    
+    /* === Efeito Vidro Fosco === */
+    background: rgba(255, 255, 255, 0.6); /* Branco semi-transparente */
+    backdrop-filter: blur(15px); /* O desfoque mágico do fundo */
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Sombra mais suave */
+}
+
+/* ====================
+   Botões (COM GRADIENTE)
+   ==================== */
+input, button {
+    width: 100%;
+    padding: 12px 14px; /* Mais padding */
+    margin-bottom: 12px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px; /* Mais arredondado */
+    font-size: 15px;
+    font-family: inherit;
+}
+
+/* Tira a borda padrão do input quando focado */
+input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.2);
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    color: white;
+    
+    /* Gradiente sutil */
+    background-image: linear-gradient(to right, #007bff 0%, #0056b3 100%);
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+button:hover {
+    opacity: 0.9;
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4); /* Sombra maior no hover */
+    transform: translateY(-1px); /* Efeito de "levantar" */
+}
+
+/* Link de toggle do login */
+.toggle-link {
+    font-size: 14px;
+    text-align: center;
+    margin-top: 15px;
+}
+.toggle-link a {
+    color: #0056b3; /* Tom mais escuro do azul */
+    text-decoration: none;
+    font-weight: 600;
+}
+.toggle-link a:hover {
+    text-decoration: underline;
+}
+
+
+/* ====================
+   Layout da Aplicação (Dashboard)
+   ==================== */
+#app {
+    max-width: 1600px;
+    margin: 0 auto;
+
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    
+    /* === Efeito Vidro Fosco === */
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #222; /* Cor mais escura para o título */
+}
+
+/* Botão Sair */
+#logout {
+    width: auto;
+    background-image: linear-gradient(to right, #dc3545 0%, #a71d2a 100%);
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+#logout:hover {
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+}
+
+/* ====================
+   Cards do Dashboard (EFEITO VIDRO FOSCO)
+   ==================== */
+.box {
+    padding: 20px;
+    border-radius: 12px;
+    
+    /* === Efeito Vidro Fosco === */
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Títulos dos Cards */
+.box h3 {
+    margin-top: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* Borda mais sutil */
+    padding-bottom: 10px;
+    font-size: 1.2rem; /* Um pouco maior */
+    color: #111; /* Preto mais forte para contraste */
+}
+
+/* ====================
+   LAYOUT EM GRID (Desktop)
+   ==================== */
+.container {
+    display: grid;
+    grid-template-columns: 35% 1fr;
+    grid-template-rows: auto auto 1fr;
+    gap: 25px;
+}
+/* ... (O resto do grid não muda) ... */
+.form-box { grid-column: 1 / 2; grid-row: 1 / 2; }
+.resumo-box { grid-column: 1 / 2; grid-row: 2 / 3; }
+.chart-box { grid-column: 1 / 2; grid-row: 3 / 4; }
+.table-box { grid-column: 2 / 3; grid-row: 1 / 4; display: flex; flex-direction: column; max-height: 85vh; }
+
+/* ====================
+   Seções Específicas
+   ==================== */
+
+/* Formulário */
+.form-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.form-grid input, .form-grid button { width: 100%; min-width: 0; margin-bottom: 0; }
+
+/* Botão Cancelar */
+#cancelEdit {
+    background-image: linear-gradient(to right, #6c757d 0%, #5a6268 100%);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+#cancelEdit:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Resumo */
+.resumo-grid p { display: flex; justify-content: space-between; font-size: 0.95rem; margin: 8px 0; border-bottom: 1px dashed #eee; padding-bottom: 8px; }
+.resumo-grid p span { font-weight: 600; }
+
+/* Filtro de Mês */
+.filtro-mes-container { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+.filtro-mes-container label { font-size: 14px; font-weight: 600; color: #555; }
+.filtro-mes-container input[type="month"] { flex: 1; padding: 8px 10px; font-size: 14px; margin-bottom: 0; }
+.filtro-mes-container button { width: auto; padding: 8px 12px; margin-bottom: 0; background-image: linear-gradient(to right, #6c757d 0%, #5a6268 100%); font-size: 14px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+.filtro-mes-container button:hover { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); }
+
+/* Estilo para a Busca */
+#caixaBusca { width: 100%; padding: 10px 12px; margin-bottom: 15px; border: 1px solid #dcdcdc; border-radius: 6px; font-size: 15px; font-family: inherit; }
+
+/* Tabela */
+.table-container { overflow-x: auto; overflow-y: auto; flex-grow: 1; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th, td { padding: 10px 12px; border: 1px solid #f0f0f0; text-align: left; font-size: 14px; vertical-align: middle; }
+th { background-color: rgba(249, 249, 249, 0.8); /* Fundo do header da tabela semi-transparente */ font-weight: 600; color: #555; }
+
+/* Botões da Tabela (Editar/Excluir) */
+td button[style*="#ffc107"] { /* Botão Editar */
+    background-image: linear-gradient(to right, #ffc107 0%, #e0a800 100%);
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+td button[style*="#dc3545"] { /* Botão Excluir */
+    background-image: linear-gradient(to right, #dc3545 0%, #a71d2a 100%);
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+/* Rodapé */
+footer { margin-top: 25px; text-align: left; }
+#exportExcel {
+    width: auto;
+    background-image: linear-gradient(to right, #28a745 0%, #1e7e34 100%);
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+#exportExcel:hover {
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+/* ====================
+   Créditos do Rodapé
+   ==================== */
+.footer-credit {
+    font-size: 13px;
+    text-align: center;
+    margin-top: 20px;
+    color: #eee; /* Cor clara para ver sobre a imagem de fundo */
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5); /* Sombra no texto */
+}
+#loginBox .footer-credit {
+    margin-bottom: 0;
+    color: #080000; /* Cor mais escura dentro da caixa branca */
+    text-shadow: none;
+}
+#app footer .footer-credit {
+    display: inline;
+    margin-left: 10px;
+}
+
+
+/* ====================
+   RESPONSIVIDADE (Mobile)
+   ==================== */
+@media (max-width: 900px) {
+    
+
+    /* Faz a caixa de login ocupar 100% da tela no mobile */
+    #loginBox {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 30px 20px;
+        min-height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    
+    /* Ajusta o padding do app para mobile */
+    #app {
+        padding: 10px;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px; /* Padding do header (OK) */
+    }
+
+    /* ===== ESTA É A NOVA REGRA ===== */
+    /* Reduz o padding de TODOS os cards no mobile */
+    .box {
+        padding: 15px;
+    }
+    /* ================================= */
+
+    .container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .form-box,
+    .resumo-box,
+    .chart-box,
+    .table-box {
+        grid-column: 1 / -1;
+        grid-row: auto;
+        max-height: none;
+    }
+
+    .chart-box {
+        max-height: 400px;
+    }
+
+    /* Mobile - Rodapé */
+    #app footer {
+        text-align: center;
+    }
+    #app footer .footer-credit {
+        display: block;
+        margin-left: 0;
+        margin-top: 15px;
+    }
+}
