@@ -1,16 +1,1 @@
-{
-"name": "controle-notas",
-"version": "1.0.0",
-"main": "server.js",
-"type": "module",
-"scripts": {
-"start": "node server.js"
-},
-"dependencies": {
-"bcrypt": "^5.1.0",
-"cors": "^2.8.5",
-"express": "^4.18.2",
-"jsonwebtoken": "^9.0.0",
-"pg": "^8.11.3"
-}
-} 
+{"name":"controle-notas","version":"1.0.0","main":"server.js","type":"module","scripts":{"start":"node server.js"},"dependencies":{"bcrypt":"^5.1.0","cors":"^2.8.5","dotenv":"^17.2.3","express":"^4.18.2","jsonwebtoken":"^9.0.0","pg":"^8.11.3"}}
