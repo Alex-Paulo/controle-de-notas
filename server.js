@@ -1,7 +1,6 @@
 import 'dotenv/config'; // Carrega as variáveis do .env
 import express from "express";
-// Removido: import sqlite3 from "sqlite3";
-import { Pool } from 'pg'; // NOVO: Importa o Pool do PostgreSQL
+import { Pool } from 'pg'; // Importa o Pool do PostgreSQL
 import cors from "cors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -12,15 +11,19 @@ const app = express();
 
 // === Lógica de Deploy (PORTA e DATABASE_URL) ===
 const PORTA = process.env.PORT || 3000;
-
-// O Render fornece a URL de conexão completa do PostgreSQL via DATABASE_URL
 const DATABASE_URL = process.env.DATABASE_URL;
+const JWT_SECRET = process.env.JWT_SECRET;
 
-// NOVO: Configuração do Pool de Conexões do PostgreSQL
-// O bloco SSL foi removido, pois a URL do Neon (com ?sslmode=require) já cuida disso.
+// Validação de Variáveis de Ambiente
+if (!DATABASE_URL || !JWT_SECRET) {
+    console.error("Erro Crítico: DATABASE_URL ou JWT_SECRET não estão definidos no ambiente.");
+    process.exit(1); // Encerra o servidor se as chaves não estiverem presentes
+}
+
+// Configuração do Pool de Conexões do PostgreSQL
+// A URL do Neon (com ?sslmode=require) já cuida do SSL.
 const db = new Pool({
     connectionString: DATABASE_URL
-    // O bloco ssl: {...} foi removido daqui
 });
 
 // Testa a conexão e cria as tabelas
@@ -29,15 +32,15 @@ db.connect(async (err, client, done) => {
         console.error("Erro ao conectar ao PostgreSQL. Verifique DATABASE_URL:", err.message);
         return;
     }
-    console.log(`Conectado ao banco de dados PostgreSQL.`); // URL removida por segurança
+    console.log(`Conectado ao banco de dados PostgreSQL.`);
 
     try {
-        // Cria tabela users (Com SERIAL PRIMARY KEY para auto-incremento no PG)
+        // Cria tabela users
         await client.query(`
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
-                username TEXT UNIQUE,
-                password_hash TEXT
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL
             )
         `);
 
@@ -62,8 +65,6 @@ db.connect(async (err, client, done) => {
 });
 // ==========================================
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -84,22 +85,16 @@ app.post("/api/register", async (req,res)=>{
     const hash = await bcrypt.hash(password,10);
     
     try {
-        // Insere o usuário
         const result = await db.query(
             "INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id",
             [username, hash]
         );
         const userId = result.rows[0].id;
         
-        if (!JWT_SECRET) {
-            console.error("JWT_SECRET não está configurado no servidor.");
-            // 'section' removido
-            return res.status(500).json({ error: "Erro interno do servidor: Chave secreta não configurada." });
-        }
         const token = jwt.sign({id: userId, username}, JWT_SECRET);
         res.json({token});
     } catch (err) {
-        if (err.code === '23505') { // Código de erro de violação de chave única (usuário já existe)
+        if (err.code === '23505') { // Usuário já existe
             return res.status(400).json({error:"Usuário já existe"});
         }
         console.error('Erro de registro no PostgreSQL:', err.message);
@@ -118,10 +113,6 @@ app.post("/api/login", async (req,res)=>{
         if(!user) return res.status(400).json({error:"Usuário não encontrado"});
         if(!await bcrypt.compare(password, user.password_hash)) return res.status(400).json({error:"Senha inválida"});
         
-        if (!JWT_SECRET) {
-            console.error("JWT_SECRET não está configurado no servidor.");
-            return res.status(500).json({ error: "Erro interno do servidor: Chave secreta não configurada." });
-        }
         const token = jwt.sign({id: user.id, username}, JWT_SECRET);
         res.json({token});
     } catch (err) {
@@ -135,10 +126,6 @@ function auth(req,res,next){
     const token = req.headers.authorization?.split(" ")[1];
     if(!token) return res.sendStatus(401);
     
-    if (!JWT_SECRET) {
-        console.error("JWT_SECRET não está configurado no servidor.");
-        return res.status(500).json({ error: "Erro interno do servidor: Chave secreta não configurada." });
-    }
     try{
         req.user = jwt.verify(token, JWT_SECRET);
         next();
@@ -155,7 +142,7 @@ app.get("/api/notas", auth, async (req,res)=>{
     } catch (err) {
         console.error('Erro ao buscar notas:', err.message);
         res.status(500).json({error: "Erro no servidor ao buscar notas."});
-    }
+  }
 });
 
 app.post("/api/notas", auth, async (req,res)=>{
@@ -175,9 +162,7 @@ app.post("/api/notas", auth, async (req,res)=>{
 
 app.delete("/api/notas/:id", auth, async (req,res)=>{
     try {
-        // Garante que o usuário só delete as próprias notas
         await db.query("DELETE FROM notas WHERE id = $1 AND user_id = $2", [req.params.id, req.user.id]);
-        // 'section' removido
         res.sendStatus(200);
     } catch (err) {
         console.error('Erro ao deletar nota:', err.message);
@@ -190,21 +175,18 @@ app.put("/api/notas/:id", auth, async (req,res)=>{
     const {data, empresa, numero, valor, observacoes} = req.body;
     
     try {
-        // 'tabela' removido
         const result = await db.query(
             "UPDATE notas SET data=$1, empresa=$2, numero=$3, valor=$4, observacoes=$5 WHERE id=$6 AND user_id=$7",
             [data, empresa, numero, valor, observacoes, req.params.id, req.user.id]
         );
 
         if (result.rowCount === 0) {
-            // 'tabela' removido
             return res.status(404).json({ error: "Nota não encontrada ou não pertence ao usuário." });
-        }
+A         }
         res.sendStatus(200); // OK
     } catch (err) {
         console.error('Erro ao atualizar nota:', err.message);
         res.status(500).json({error: "Erro no servidor ao atualizar nota."});
-     // 'action' removido
     }
 });
 
